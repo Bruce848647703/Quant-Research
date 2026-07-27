@@ -1,0 +1,44 @@
+# Quant-Research 全局配置
+
+# 数据配置
+data:
+  # 股票池
+  universe: "hs300"  # 沪深300成分股
+  # 数据时间范围
+  start_date: "20220101"
+  end_date: "20250701"
+  # 数据存放路径
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+
+# 因子配置
+factor:
+  name: "short_term_reversal"
+  # 趋势窗口（交易日）
+  trend_window: 5
+  # 反转窗口（交易日）
+  reversal_window: 1
+
+# 回测配置
+backtest:
+  # 初始资金
+  initial_cash: 1000000
+  # 手续费率（万分之三）
+  commission: 0.0003
+  # 印花税率（千分之一，仅卖出）
+  stamp_tax: 0.001
+  # 调仓频率: weekly / biweekly / monthly
+  rebalance_freq: "weekly"
+  # 分组数量
+  num_groups: 5
+  # 做多组别（1=最高分）
+  long_group: 1
+  # 做空组别（5=最低分）
+  short_group: 5
+  # 每组持仓数量
+  stocks_per_group: 20
+
+# 结果输出
+results:
+  report_dir: "results/reports"
+  plot_dir: "results/plots"
