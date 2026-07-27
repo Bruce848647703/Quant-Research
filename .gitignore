@@ -19,17 +19,15 @@ env/
 *.swp
 *.swo
 
-# Data files
-data/raw/*
-data/processed/*
-!data/raw/.gitkeep
-!data/processed/.gitkeep
+# Data files (raw data is too large for GitHub)
+data/raw/*.parquet
+data/raw/*.csv
+data/processed/*.parquet
+data/processed/*.csv
 
-# Results
-results/reports/*
-results/plots/*
-!results/reports/.gitkeep
-!results/plots/.gitkeep
+# Results (keep reports and plots for GitHub showcase)
+# results/reports/*
+# results/plots/*
 
 # Jupyter
 .ipynb_checkpoints/
