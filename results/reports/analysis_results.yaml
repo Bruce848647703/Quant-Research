@@ -1,0 +1,48 @@
+drawdown:
+  current_drawdown: 0.003297843901844726
+  final_value: 1205288.9823725019
+  max_drawdown: 0.07541570893886562
+  peak_value: 1209276.9891167015
+sharpe:
+  annual_return: !!python/object/apply:numpy.core.multiarray.scalar
+  - &id001 !!python/object/apply:numpy.dtype
+    args:
+    - f8
+    - false
+    - true
+    state: !!python/tuple
+    - 3
+    - <
+    - null
+    - null
+    - null
+    - -1
+    - -1
+    - 0
+  - !!binary |
+    wMYUAssjpT8=
+  final_value: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    qMN8+yhkMkE=
+  sharpe: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    7f5YQhf+2z8=
+  total_return: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    IG/CzOhGyj8=
+  volatility: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    gvWCHabrqD8=
+trades:
+  avg_loss: 1096.6159995237383
+  avg_profit: 2183.5745429968188
+  losing_trades: 139
+  net_profit: 190391.57931670093
+  profit_factor: 2.2490457852168437
+  total_trades: 296
+  win_rate: 0.5304054054054054
+  winning_trades: 157
