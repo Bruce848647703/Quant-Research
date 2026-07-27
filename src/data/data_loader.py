@@ -3,6 +3,7 @@
 使用 akshare 获取A股日线数据
 """
 import os
+import time
 import pandas as pd
 import akshare as ak
 from typing import List, Optional
@@ -27,47 +28,54 @@ class DataLoader:
             print(f"获取沪深300成分股失败: {e}")
             return pd.DataFrame()
     
-    def fetch_stock_daily(self, stock_code: str, start_date: str, end_date: str) -> pd.DataFrame:
+    def fetch_stock_daily(self, stock_code: str, start_date: str, end_date: str,
+                         max_retries: int = 3, retry_delay: float = 2.0) -> pd.DataFrame:
         """
-        获取单只股票日线数据
+        获取单只股票日线数据（含重试机制）
         
         Args:
             stock_code: 股票代码，如 '000001'
             start_date: 开始日期，格式 'YYYYMMDD'
             end_date: 结束日期，格式 'YYYYMMDD'
+            max_retries: 最大重试次数
+            retry_delay: 重试间隔（秒）
             
         Returns:
             DataFrame with columns: date, open, high, low, close, volume, amount
         """
-        try:
-            df = ak.stock_zh_a_hist(
-                symbol=stock_code,
-                period="daily",
-                start_date=start_date,
-                end_date=end_date,
-                adjust="qfq"  # 前复权
-            )
-            if df.empty:
+        for attempt in range(max_retries):
+            try:
+                df = ak.stock_zh_a_hist(
+                    symbol=stock_code,
+                    period="daily",
+                    start_date=start_date,
+                    end_date=end_date,
+                    adjust="qfq"  # 前复权
+                )
+                if df.empty:
+                    return df
+                
+                # 标准化列名
+                df = df.rename(columns={
+                    "日期": "date",
+                    "开盘": "open",
+                    "最高": "high",
+                    "最低": "low",
+                    "收盘": "close",
+                    "成交量": "volume",
+                    "成交额": "amount",
+                    "涨跌幅": "pct_change",
+                })
+                df["date"] = pd.to_datetime(df["date"])
+                df["stock_code"] = stock_code
+                df = df.set_index(["date", "stock_code"]).sort_index()
                 return df
-            
-            # 标准化列名
-            df = df.rename(columns={
-                "日期": "date",
-                "开盘": "open",
-                "最高": "high",
-                "最低": "low",
-                "收盘": "close",
-                "成交量": "volume",
-                "成交额": "amount",
-                "涨跌幅": "pct_change",
-            })
-            df["date"] = pd.to_datetime(df["date"])
-            df["stock_code"] = stock_code
-            df = df.set_index(["date", "stock_code"]).sort_index()
-            return df
-        except Exception as e:
-            print(f"获取 {stock_code} 数据失败: {e}")
-            return pd.DataFrame()
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay * (attempt + 1))
+                else:
+                    print(f"\n获取 {stock_code} 数据失败(重试{max_retries}次): {e}")
+                    return pd.DataFrame()
     
     def fetch_all_stocks(self, stock_codes: List[str], start_date: str, end_date: str,
                          save: bool = True) -> pd.DataFrame:
@@ -84,6 +92,7 @@ class DataLoader:
             合并后的DataFrame
         """
         all_data = []
+        failed = []
         total = len(stock_codes)
         
         for i, code in enumerate(stock_codes):
@@ -91,8 +100,15 @@ class DataLoader:
             df = self.fetch_stock_daily(code, start_date, end_date)
             if not df.empty:
                 all_data.append(df)
+            else:
+                failed.append(code)
+            # 限速：每次请求后暂停，避免被数据源封禁
+            time.sleep(0.5)
         
         print()  # 换行
+        print(f"成功: {len(all_data)}, 失败: {len(failed)}")
+        if failed:
+            print(f"失败股票: {failed[:10]}{'...' if len(failed) > 10 else ''}")
         
         if not all_data:
             return pd.DataFrame()

@@ -161,7 +161,7 @@ class ShortTermReversalStrategy(bt.Strategy):
         self.log(f"调仓完成, 持仓股票数: {len(target_stocks)}")
 
 
-class FactorDataFeed(bt.PandasData):
+class FactorDataFeed(bt.feeds.PandasData):
     """
     自定义数据源，包含因子值字段
     """
